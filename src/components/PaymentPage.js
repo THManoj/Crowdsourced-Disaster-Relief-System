@@ -10,7 +10,7 @@ const PaymentPage = () => {
   
   const [paymentData, setPaymentData] = useState({
     amount: '',
-    payment_method: '',
+    payment_method: ''
   });
 
   const handleInputChange = (e) => {
@@ -23,14 +23,30 @@ const PaymentPage = () => {
   const handlePayment = async (e) => {
     e.preventDefault();
     
+    if (!disaster || !userId || !paymentData.amount || !paymentData.payment_method) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
     try {
-      // Submit both donation and payment in one request
-      const response = await axios.post('http://localhost:3001/api/submitdonations', {
-        donor_id: userId,
-        disaster_id: disaster.value,
+      const donationData = {
+        donor_id: parseInt(userId),
+        disaster_id: parseInt(disaster.value), // Ensure this is the selected disaster ID
         amount: parseFloat(paymentData.amount),
         payment_method: paymentData.payment_method
-      });
+      };
+
+      console.log('Submitting donation data:', donationData);
+
+      const response = await axios.post(
+        'http://localhost:3001/api/submitdonations', 
+        donationData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
       if (response.status === 201) {
         alert('Payment completed successfully!');
@@ -38,7 +54,7 @@ const PaymentPage = () => {
       }
     } catch (error) {
       console.error('Payment error:', error);
-      alert('Payment failed. Please try again.');
+      alert(`Payment failed: ${error.response?.data?.error || error.message}. Please try again.`);
     }
   };
 

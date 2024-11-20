@@ -1,67 +1,78 @@
-CREATE DATABASE DisasterManagementSystem;
+CREATE DATABASE IF NOT EXISTS disastermanagementsystem;
 
-USE DisasterManagementSystem;
+USE disastermanagementsystem;
 
--- Table for Users
-CREATE TABLE Users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(100) NOT NULL,
-    phone_number VARCHAR(15),
-    role ENUM('User', 'Volunteer', 'Admin') NOT NULL
-);
-
--- Table for Disasters
-CREATE TABLE Disasters (
-    disaster_id INT PRIMARY KEY AUTO_INCREMENT,
+-- Table: disasters
+CREATE TABLE disasters (
+    disaster_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     disaster_type VARCHAR(50) NOT NULL,
     location VARCHAR(100) NOT NULL,
     severity_level INT NOT NULL,
-    description TEXT,
-    reported_by INT,
-    reported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (reported_by) REFERENCES Users(user_id)
+    description TEXT DEFAULT NULL,
+    reported_by INT DEFAULT NULL,
+    reported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Table for Relief Camps
-CREATE TABLE ReliefCamps (
-    camp_id INT PRIMARY KEY AUTO_INCREMENT,
+-- Table: donations
+CREATE TABLE donations (
+    donation_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    donor_id INT DEFAULT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    donated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    disaster_id INT DEFAULT NULL
+);
+
+-- Table: ongoingdisasters
+CREATE TABLE ongoingdisasters (
+    ongoing_disaster_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    disaster_id INT NOT NULL,
+    start_date DATE NOT NULL
+);
+
+-- Table: payments
+CREATE TABLE payments (
+    payment_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    payment_method ENUM('Credit Card','Debit Card','PayPal','Bank Transfer') NOT NULL
+);
+
+-- Table: profiles
+CREATE TABLE profiles (
+    profile_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    total_donations DECIMAL(10,2) DEFAULT 0.00,
+    tasks_completed INT DEFAULT 0
+);
+
+-- Table: reliefcamps
+CREATE TABLE reliefcamps (
+    camp_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     camp_name VARCHAR(100) NOT NULL,
     location VARCHAR(100) NOT NULL,
     capacity INT NOT NULL,
-    manager_id INT,
-    FOREIGN KEY (manager_id) REFERENCES Users(user_id)
+    disaster_id INT DEFAULT NULL
 );
 
--- Table for Volunteers
-CREATE TABLE Volunteers (
-    volunteer_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    camp_id INT,
-    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    task_description TEXT,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id),
-    FOREIGN KEY (camp_id) REFERENCES ReliefCamps(camp_id)
-);
-
--- Table for Donations
-CREATE TABLE Donations (
-    donation_id INT PRIMARY KEY AUTO_INCREMENT,
-    donor_id INT,
-    amount DECIMAL(10, 2) NOT NULL,
-    donated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (donor_id) REFERENCES Users(user_id)
-);
-
--- Table for SOS Alerts
-CREATE TABLE SOSAlerts (
-    alert_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    disaster_id INT,
+-- Table: sosalerts
+CREATE TABLE sosalerts (
+    alert_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL,
+    disaster_id INT DEFAULT NULL,
     message TEXT NOT NULL,
-    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('Pending', 'Resolved') DEFAULT 'Pending',
-    FOREIGN KEY (user_id) REFERENCES Users(user_id),
-    FOREIGN KEY (disaster_id) REFERENCES Disasters(disaster_id)
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    status ENUM('Pending','Resolved') DEFAULT 'Pending'
+);
+
+-- Table: users
+CREATE TABLE users (
+    user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    phone_number VARCHAR(15) NOT NULL,
+    country VARCHAR(50) NOT NULL,
+    city VARCHAR(64) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    role ENUM('User','Volunteer','Admin') DEFAULT 'User' NOT NULL
 );

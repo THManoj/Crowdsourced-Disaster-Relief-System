@@ -78,7 +78,7 @@ const Home = () => {
                         {recentDonations.map((donation) => (
                             <div key={donation.donation_id} className="donation-card">
                                 <div className="donation-content">
-                                    <h3>Amount: ₹{parseFloat(donation.amount).toFixed(2)}</h3>
+                                    <h3>Amount: ${parseFloat(donation.amount).toFixed(2)}</h3>
                                     <p>Location: {donation.location}</p>
                                     <p>Date: {new Date(donation.donated_at).toLocaleDateString()}</p>
                                     <p>Disaster Type: {donation.disaster_type}</p>

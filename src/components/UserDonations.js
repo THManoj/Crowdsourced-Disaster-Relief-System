@@ -31,16 +31,18 @@ const UserDonations = () => {
               <th>Payment Method</th>
               <th>Disaster Type</th>
               <th>Location</th>
+              <th>Donation ID</th>
             </tr>
           </thead>
           <tbody>
             {donations.map((donation) => (
-              <tr key={donation.payment_id}>
+              <tr key={`${donation.payment_id}-${donation.donation_id}`}>
                 <td>{new Date(donation.payment_date).toLocaleString()}</td>
                 <td>${parseFloat(donation.amount).toFixed(2)}</td>
                 <td>{donation.payment_method}</td>
                 <td>{donation.disaster_type}</td>
                 <td>{donation.location}</td>
+                <td>{donation.donation_id}</td>
               </tr>
             ))}
           </tbody>
